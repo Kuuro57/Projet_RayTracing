@@ -1,5 +1,3 @@
-package raytracer.client;
-
 import java.time.Instant;
 import java.time.Duration;
 
