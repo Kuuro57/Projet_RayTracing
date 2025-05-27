@@ -1,6 +1,18 @@
 package raytracer.client;
+
 import java.time.Instant;
 import java.time.Duration;
+
+import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.RemoteException;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
+import java.rmi.server.ServerNotActiveException;
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
 
 public class LancerRaytracer {
 
@@ -54,5 +66,23 @@ public class LancerRaytracer {
         // Affichage de l'image calculée
         disp.setImage(image, x0, y0);
         disp.setImage(image2, l / 2, h / 2);
+
+        // On créer un objet distant avec la scene
+        try {
+            // On récupère l'annuaire local
+            Registry registry = LocateRegistry.createRegistry(1099);
+
+            // On exporte l'objet distant
+            SceneInterface stub = (SceneInterface) UnicastRemoteObject.exportObject(scene, 0);
+
+            // On récupère le service du distributeur de noeuds
+
+            // On récupère un noeud avec le service
+
+            // On calcul l'image avec le noeud
+
+        } catch (RemoteException e) {
+            System.err.println("Erreur lors de la création du serveur RMI : " + e.getMessage());
+        }
     }
 }
