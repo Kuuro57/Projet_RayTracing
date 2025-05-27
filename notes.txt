@@ -1,0 +1,11 @@
+on peut choisir la résolution, le nombre de bloc en longueur et largeur. (4 = 16 blocs)
+machines solicités plusieurs fois quand le nombre de clacul est trop grand (logique)
+
+calcul séquensaire ?? mal écrit sûrement, 1 par 1 dans l'ordre
+on peut faire parallele, beaucoup plus rapide
+
+P1 divise en petit bout. 
+Puis il demande une machine à P2
+la machine calcul et P1 récupère le résultat
+
+deux dernières parties à mettre en parallele.
