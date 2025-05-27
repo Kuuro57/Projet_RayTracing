@@ -1,4 +1,3 @@
-package raytracer.client;
 import java.io.*;
 
 /**
