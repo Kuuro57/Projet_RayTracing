@@ -70,7 +70,7 @@ public class LancerRaytracer {
         // On créer un objet distant avec la scene
         try {
             // On récupère l'annuaire local
-            Registry registry = LocateRegistry.createRegistry(1099);
+            Registry registry = LocateRegistry.getRegistry(1099);
 
             // On exporte l'objet distant
             SceneInterface stub = (SceneInterface) UnicastRemoteObject.exportObject(scene, 0);
