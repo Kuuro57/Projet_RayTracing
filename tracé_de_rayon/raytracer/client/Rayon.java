@@ -1,4 +1,4 @@
-package raytracer;
+package raytracer.client;
 /**
  * Classe qui représente un rayon. 
  * Un rayon est défini par son origine (un point) et sa direction (un vecteur).

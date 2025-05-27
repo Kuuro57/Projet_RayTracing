@@ -1,4 +1,4 @@
-package raytracer;
+package raytracer.client;
 import java.io.*;
 
 /**

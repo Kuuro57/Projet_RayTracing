@@ -1,4 +1,4 @@
-package raytracer;
+package raytracer.client;
 import java.io.*;
 /** Classe définissant les caractéristiques d'un matériau. Ces caractéristiques
  * sont adaptées au modèle de réflexion de Phong et incluent les coefficients de
