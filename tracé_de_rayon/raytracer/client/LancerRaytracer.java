@@ -1,9 +1,6 @@
+package raytracer.client;
 import java.time.Instant;
 import java.time.Duration;
-
-import raytracer.client.Disp;
-import raytracer.client.Scene;
-import raytracer.client.Image;
 
 public class LancerRaytracer {
 
