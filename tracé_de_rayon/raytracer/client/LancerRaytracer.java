@@ -14,7 +14,7 @@ import java.rmi.registry.LocateRegistry;
 
 public class LancerRaytracer {
 
-    public static String aide = "Raytracer : synthèse d'image par lancé de rayons (https://en.wikipedia.org/wiki/Ray_tracing_(graphics))\n\nUsage : java LancerRaytracer [fichier-scène] [largeur] [hauteur]\n\tfichier-scène : la description de la scène (par défaut simple.txt)\n\tlargeur : largeur de l'image calculée (par défaut 512)\n\thauteur : hauteur de l'image calculée (par défaut 512)\n";
+    public static String aide = "Raytracer : synthèse d'image par lancé de rayons (https://en.wikipedia.org/wiki/Ray_tracing_(graphics))\n\nUsage : java LancerRaytracer [ip-repository] [port-repository] [fichier-scène] [largeur] [hauteur] [nb-decoupe] [mode-exec]\n\tfichier-scène : la description de la scène (par défaut simple.txt)\n\tlargeur : largeur de l'image calculée (par défaut 512)\n\thauteur : hauteur de l'image calculée (par défaut 512)\n\tnb-decoupe : nombre de découpes de l'image (par défaut 8)\n\tmode-exec : mode d'exécution (par défaut 0, 0 = séquentiel, 1 = parallèle)\n";
 
     public static void main(String args[]) {
 
@@ -74,6 +74,11 @@ public class LancerRaytracer {
                 div = Integer.parseInt(args[5]);
             }
 
+            int mode_exec = 0;
+            if (args.length > 5) {
+                mode_exec = Integer.parseInt(args[6]);
+            }
+
             // On récupère l'annuaire local
             Registry reg = LocateRegistry.getRegistry(serveur, port);
 
@@ -86,12 +91,26 @@ public class LancerRaytracer {
             // On calcul l'image avec le noeud
             Instant debut = Instant.now();
 
-            for (int i = 0; i < div; i++) {
-                for (int j = 0; j < div; j++) {
-                    NoeudInterface noeud = (NoeudInterface) distrib.getNoeud();
-                    Image image = noeud.calculer(scene, j * l / div, i * h / div, l / div, h / div);
-                    // Image image = scene.compute(j*l/div, i*h/div, l/div, h/div);
-                    disp.setImage(image, j * l / div, i * h / div);
+            if (mode_exec == 0) {
+                for (int i = 0; i < div; i++) {
+                    for (int j = 0; j < div; j++) {
+                        NoeudInterface noeud = (NoeudInterface) distrib.getNoeud();
+                        Image image;
+                        if (noeud == null) {
+                            image = scene.compute(j * l / div, i * h / div, l / div, h / div);
+                        } else {
+                            image = noeud.calculer(scene, j * l / div, i * h / div, l / div, h / div);
+                        }
+                        disp.setImage(image, j * l / div, i * h / div);
+                    }
+                }
+            } else {
+                for (int i = 0; i < div; i++) {
+                    for (int j = 0; j < div; j++) {
+                        NoeudInterface noeud = (NoeudInterface) distrib.getNoeud();
+                        ThreadCalcul thread = new ThreadCalcul(disp, noeud, scene, div, i, j, l, h);
+                        thread.start();
+                    }
                 }
             }
 
@@ -107,4 +126,55 @@ public class LancerRaytracer {
             System.err.println("Erreur : " + e.getMessage());
         }
     }
+
+    /**
+     * Classe qui permet de séparer les calculs dans des threads différents
+     */
+    static class ThreadCalcul extends Thread {
+
+        private Disp disp;
+        private NoeudInterface noeud;
+        private Scene scene;
+        private int div;
+        private int l;
+        private int h;
+        private int i;
+        private int j;
+
+        ThreadCalcul(Disp disp, NoeudInterface noeud, Scene scene, int div, int i, int j, int l, int h) {
+            this.disp = disp;
+            this.noeud = noeud;
+            this.scene = scene;
+            this.div = div;
+            this.l = l;
+            this.i = i;
+            this.j = j;
+            this.h = h;
+        }
+
+        @Override
+        public void run() {
+
+            try {
+                Image image;
+                if (this.noeud == null) {
+                    // Si le noeud est nul, on utilise la scène pour calculer l'image
+                    image = this.scene.compute(this.j * this.l / this.div, this.i * this.h / this.div,
+                            this.l / this.div, this.h / this.div);
+                } else
+                    // Sinon, on utilise le noeud pour calculer l'image
+                    image = this.noeud.calculer(this.scene, this.j * this.l / this.div, this.i * this.h / this.div,
+                            this.l / this.div, this.h / this.div);
+                // Image image = scene.compute(j*l/div, i*h/div, l/div, h/div);
+                synchronized (disp) {
+                    disp.setImage(image, this.j * this.l / this.div, this.i * this.h / this.div);
+                }
+            } catch (RemoteException e) {
+                System.out.println("Erreur lors de la création du serveur RMI : " + e.getMessage());
+            }
+
+        }
+
+    }
+
 }

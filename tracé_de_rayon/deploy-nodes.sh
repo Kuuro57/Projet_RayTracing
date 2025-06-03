@@ -6,7 +6,7 @@ app_dir="${cur_dir}"
 app_file="noeud.jar"
 
 
-ssh_cmd="ssh -f"
+ssh_cmd="ssh -f -o ConnectTimeout=1 -o StrictHostKeyChecking=accept-new"
 username=$(whoami)
 
 server="localhost"
@@ -74,7 +74,7 @@ case $room in
         max_ip="246"
         node_list=$(seq -f "${ip_prefix}.%g" ${min_ip} ${max_ip})
         ;;
-     pc127)""
+     pc127)
         ip_prefix="100.64.80"
         min_ip="208"
         max_ip="223"
