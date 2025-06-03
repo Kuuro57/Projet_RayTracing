@@ -23,6 +23,9 @@ public class MainNoeud {
         }
 
         try {
+
+            System.out.println("Hey !");
+
             /* Création du noeud */
             Noeud noeud = new Noeud();
 

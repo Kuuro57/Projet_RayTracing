@@ -6,7 +6,7 @@ app_dir="${cur_dir}"
 app_file="noeud.jar"
 
 
-ssh_cmd="ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=accept-new"
+ssh_cmd="ssh -f"
 username=$(whoami)
 
 server="localhost"
@@ -98,7 +98,7 @@ for node in $node_list ; do
         ${ssh_cmd} ${node} "killall -u ${username} java"
     else
         echo "launching on ${node}"
-        ${ssh_cmd} ${node} "${app_cmd} ${server} ${port} &" &
+        ${ssh_cmd} ${node} "${app_cmd} ${server} ${port}" &
     fi
     
     sleep .3

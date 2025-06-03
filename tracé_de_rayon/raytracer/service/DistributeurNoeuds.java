@@ -29,6 +29,7 @@ public class DistributeurNoeuds implements ServiceDistributeur {
      */
     public void ajouterNoeud(NoeudInterface noeud) throws RemoteException, ServerNotActiveException {
         this.listeNoeuds.add(noeud);
+        System.out.println("Noeud ajouté ! (nombre de noeuds : " + this.listeNoeuds.size());
     }
 
     /**
@@ -47,10 +48,9 @@ public class DistributeurNoeuds implements ServiceDistributeur {
      */
     public NoeudInterface getNoeud() throws RemoteException, ServerNotActiveException {
 
+        incr += 1;
         if (incr >= this.listeNoeuds.size()) {
             incr = 0;
-        } else {
-            incr += 1;
         }
 
         NoeudInterface noeud = this.listeNoeuds.get(incr);
