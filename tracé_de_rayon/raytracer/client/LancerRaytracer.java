@@ -18,74 +18,94 @@ public class LancerRaytracer {
 
     public static void main(String args[]) {
 
-        // Le fichier de description de la scène si pas fournie
-        String fichier_description = "simple.txt";
+        // On récupère l'adresse du serveur et le port si ils sont dans la ligne de commande
+        // Sinon, on attribut des valeurs par défaut
+        String serveur = "localhost";
+        int port = 1099;
 
-        // largeur et hauteur par défaut de l'image à reconstruire
-        int largeur = 512, hauteur = 512;
+        // On récupère l'adresse de l'annuaire en paramètre
+        if (args.length > 0){ serveur = args[0]; }
 
-        if (args.length > 0) {
-            fichier_description = args[0];
-            if (args.length > 1) {
-                largeur = Integer.parseInt(args[1]);
-                if (args.length > 2)
-                    hauteur = Integer.parseInt(args[2]);
-            }
-        } else {
-            System.out.println(aide);
-        }
+        // On récupère le port de l'annuaire en paramètre
+        if (args.length > 1){ port = Integer.parseInt(args[1]); }
 
-        // création d'une fenêtre
-        Disp disp = new Disp("Raytracer", largeur, hauteur);
-
-        // Initialisation d'une scène depuis le modèle
-        Scene scene = new Scene(fichier_description, largeur, hauteur);
-
-        // Calcul de l'image de la scène les paramètres :
-        // - x0 et y0 : correspondant au coin haut à gauche
-        // - l et h : hauteur et largeur de l'image calculée
-        // Ici on calcule toute l'image (0,0) -> (largeur, hauteur)
-
-        int x0 = 0, y0 = 0;
-        int l = largeur, h = hauteur;
-
-        // Chronométrage du temps de calcul
-        Instant debut = Instant.now();
-        System.out.println("Calcul de l'image :\n - Coordonnées : " + x0 + "," + y0
-                + "\n - Taille " + largeur + "x" + hauteur);
-        Image image = scene.compute(x0, y0, l / 2, h / 2);
-        Image image2 = scene.compute(l / 2, h / 2, l / 2, l / 2);
-        Instant fin = Instant.now();
-
-        long duree = Duration.between(debut, fin).toMillis();
-
-        System.out.println("Image calculée en :" + duree + " ms");
-
-        // Affichage de l'image calculée
-        disp.setImage(image, x0, y0);
-        disp.setImage(image2, l / 2, h / 2);
-
-        // On créer un objet distant avec la scene
+        
         try {
+
+            // Le fichier de description de la scène si pas fournie
+            String fichier_description = "simple.txt";
+
+            // Largeur et hauteur par défaut de l'image à reconstruire
+            int largeur = 512, hauteur = 512;
+
+            if (args.length > 1) {
+
+                fichier_description = args[2];
+                if (args.length > 2) {
+                    largeur = Integer.parseInt(args[3]);
+                    if (args.length > 3) hauteur = Integer.parseInt(args[4]); 
+                }
+
+            } 
+            else { System.out.println(aide); }
+
+
+            // Création d'une fenêtre
+            Disp disp = new Disp("Raytracer", largeur, hauteur);
+
+            // Initialisation d'une scène depuis le modèle
+            Scene scene = new Scene(fichier_description, largeur, hauteur);
+
+            // Calcul de l'image de la scène les paramètres :
+            // - x0 et y0 : correspondant au coin haut à gauche
+            // - l et h : hauteur et largeur de l'image calculée
+            // Ici on calcule toute l'image (0,0) -> (largeur, hauteur)
+
+            int x0 = 0, y0 = 0;
+            int l = largeur, h = hauteur;
+
+
+            int div = 8;
+            if(args.length > 4){ div = Integer.parseInt(args[5]); }
+
+
             // On récupère l'annuaire local
-            Registry registry = LocateRegistry.getRegistry(1099);
+            Registry reg = LocateRegistry.getRegistry(port);
 
             // On exporte l'objet distant
             SceneInterface stub = (SceneInterface) UnicastRemoteObject.exportObject(scene, 0);
 
             // On récupère le service du distributeur de noeuds
-            Registry reg = LocateRegistry.getRegistry(5555);
             ServiceDistributeur distrib = (ServiceDistributeur) reg.lookup("distributeur");
-
-            // On récupère un noeud avec le service
-
+            
             // On calcul l'image avec le noeud
+            Instant debut = Instant.now();
+            
+            for(int i=0;i<div;i++){
+                for(int j=0;j<div;j++){
+                    NoeudInterface noeud = (NoeudInterface) distrib.getNoeud();
+                    Image image = noeud.calculer(scene,j*l/div, i*h/div, l/div, h/div);
+                    //Image image = scene.compute(j*l/div, i*h/div, l/div, h/div);
+                    disp.setImage(image, j*l/div, i*h/div);
+                }
+            }
 
-        } catch (RemoteException e) {
+            Instant fin = Instant.now();
+            long duree = Duration.between(debut, fin).toMillis();
+            System.out.println("Image calculée en :" + duree + " ms");
+
+
+
+
+        } 
+        catch (RemoteException e) {
             System.err.println("Erreur lors de la création du serveur RMI : " + e.getMessage());
         }
         catch (NotBoundException e) {
-            System.err.println("Erreur lors de la création du serveur RMI : " + e.getMessage());
+            System.err.println("Erreur : " + e.getMessage());
+        }
+        catch (ServerNotActiveException e) {
+            System.err.println("Erreur : " + e.getMessage());
         }
     }
 }

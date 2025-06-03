@@ -1,5 +1,61 @@
+import java.rmi.RemoteException;
+import java.rmi.Remote;
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
+import java.util.ArrayList;
+
+/**
+ * Classe qui représente un distributeur de noeuds de calcul
+ */
 public class DistributeurNoeuds implements ServiceDistributeur {
+
+
+    // Attributs
+    private int incr = 0;   // Itérateur
+    ArrayList<NoeudInterface> listeNoeuds;  // Liste de noeuds qui contient les IPs de chaque machine utilisable
+
+
+    /**
+     * Constructeur
+     */
+    public DistributeurNoeuds(){
+
+        this.listeNoeuds = new ArrayList<String>();
+
+    }
+
+
+    /**
+     * Méthode qui ajoute un noeud à la liste de noeuds
+     * @param noeud Une adresse IP
+     */
+    public void ajouterNoeud(String noeud) throws RemoteException, ServerNotActiveException {
+        
+        this.listeNoeuds.add(noeud);
+
+    }
+
+
+    /**
+     * Méthode qui supprime un noeud de la liste de noeuds
+     */
+    public void supprimerNoeud(String noeud){
+        this.listeNoeuds.remove(noeud);
+    }
     
-    // TODO
+
+    /**
+     * Méthode qui renvooie un noeud pour effectuer un calcul
+     */
+    public NoeudInterface getNoeud() throws RemoteException, ServerNotActiveException {
+        
+        if (incr == this.listeNoeuds.size()) { incr = 0; }
+        else { incr += 1; }
+
+        NoeudInterface noeud = this.listeNoeuds.get(incr);
+
+        return noeud;
+        
+    }
 
 }

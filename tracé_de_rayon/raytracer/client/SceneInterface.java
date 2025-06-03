@@ -1,14 +1,15 @@
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 public interface SceneInterface extends Remote {
     /**
      * Computes the image for the specified region of the scene.
      *
-     * @param x0 the x-coordinate of the top-left corner of the region
-     * @param y0 the y-coordinate of the top-left corner of the region
-     * @param w  the width of the region
+     * @param x the x-coordinate of the top-left corner of the region
+     * @param y the y-coordinate of the top-left corner of the region
+     * @param l  the width of the region
      * @param h  the height of the region
      * @return an Image object representing the computed image
      */
-    Image compute(int x0, int y0, int w, int h) throws java.rmi.RemoteException;
+    Image compute(int x, int y, int l, int h) throws RemoteException;
 }
