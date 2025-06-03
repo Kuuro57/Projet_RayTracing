@@ -28,15 +28,17 @@ public class DistributeurNoeuds implements ServiceDistributeur {
      * @param noeud Une adresse IP
      */
     public void ajouterNoeud(NoeudInterface noeud) throws RemoteException, ServerNotActiveException {
-
         this.listeNoeuds.add(noeud);
-
     }
 
     /**
      * Méthode qui supprime un noeud de la liste de noeuds
      */
     public void supprimerNoeud(NoeudInterface noeud) {
+        // On vérifie la position du noeud dans la liste pour modifier l'itérateur
+        if (this.listeNoeuds.indexOf(noeud) < incr) {
+            incr -= 1; // On décrémente l'itérateur si le noeud supprimé est avant l'itérateur
+        }
         this.listeNoeuds.remove(noeud);
     }
 
@@ -45,7 +47,7 @@ public class DistributeurNoeuds implements ServiceDistributeur {
      */
     public NoeudInterface getNoeud() throws RemoteException, ServerNotActiveException {
 
-        if (incr == this.listeNoeuds.size()) {
+        if (incr >= this.listeNoeuds.size()) {
             incr = 0;
         } else {
             incr += 1;
