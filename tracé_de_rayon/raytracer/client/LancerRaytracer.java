@@ -74,12 +74,17 @@ public class LancerRaytracer {
             SceneInterface stub = (SceneInterface) UnicastRemoteObject.exportObject(scene, 0);
 
             // On récupère le service du distributeur de noeuds
+            Registry reg = LocateRegistry.getRegistry(5555);
+            ServiceDistributeur distrib = (ServiceDistributeur) reg.lookup("distributeur");
 
             // On récupère un noeud avec le service
 
             // On calcul l'image avec le noeud
 
         } catch (RemoteException e) {
+            System.err.println("Erreur lors de la création du serveur RMI : " + e.getMessage());
+        }
+        catch (NotBoundException e) {
             System.err.println("Erreur lors de la création du serveur RMI : " + e.getMessage());
         }
     }
