@@ -74,7 +74,7 @@ case $room in
         max_ip="246"
         node_list=$(seq -f "${ip_prefix}.%g" ${min_ip} ${max_ip})
         ;;
-     pc127)
+     pc127)""
         ip_prefix="100.64.80"
         min_ip="208"
         max_ip="223"

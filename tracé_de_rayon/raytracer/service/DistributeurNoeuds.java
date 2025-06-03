@@ -9,53 +9,52 @@ import java.util.ArrayList;
  */
 public class DistributeurNoeuds implements ServiceDistributeur {
 
-
     // Attributs
-    private int incr = 0;   // Itérateur
-    ArrayList<NoeudInterface> listeNoeuds;  // Liste de noeuds qui contient les IPs de chaque machine utilisable
-
+    private int incr = 0; // Itérateur
+    ArrayList<NoeudInterface> listeNoeuds; // Liste de noeuds qui contient les IPs de chaque machine utilisable
 
     /**
      * Constructeur
      */
-    public DistributeurNoeuds(){
+    public DistributeurNoeuds() {
 
-        this.listeNoeuds = new ArrayList<String>();
+        this.listeNoeuds = new ArrayList<NoeudInterface>();
 
     }
 
-
     /**
      * Méthode qui ajoute un noeud à la liste de noeuds
+     * 
      * @param noeud Une adresse IP
      */
-    public void ajouterNoeud(String noeud) throws RemoteException, ServerNotActiveException {
-        
+    public void ajouterNoeud(NoeudInterface noeud) throws RemoteException, ServerNotActiveException {
+
         this.listeNoeuds.add(noeud);
 
     }
 
-
     /**
      * Méthode qui supprime un noeud de la liste de noeuds
      */
-    public void supprimerNoeud(String noeud){
+    public void supprimerNoeud(NoeudInterface noeud) {
         this.listeNoeuds.remove(noeud);
     }
-    
 
     /**
      * Méthode qui renvooie un noeud pour effectuer un calcul
      */
     public NoeudInterface getNoeud() throws RemoteException, ServerNotActiveException {
-        
-        if (incr == this.listeNoeuds.size()) { incr = 0; }
-        else { incr += 1; }
+
+        if (incr == this.listeNoeuds.size()) {
+            incr = 0;
+        } else {
+            incr += 1;
+        }
 
         NoeudInterface noeud = this.listeNoeuds.get(incr);
 
         return noeud;
-        
+
     }
 
 }
