@@ -1,5 +1,3 @@
-package raytracer.client;
-
 import java.rmi.Remote;
 
 public interface SceneInterface extends Remote {
